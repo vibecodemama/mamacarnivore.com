@@ -4,7 +4,7 @@ This is the repository for [mamacarnivore.com](https://mamacarnivore.com), a per
 
 ## How It Works
 
-This website is automatically built and deployed using GitHub Actions. The build process:
+This website is automatically built and deployed using GitHub's official Pages deployment workflow. The build process:
 
 1. Reads a list of links from `links.json`
 2. Visits each website
@@ -12,6 +12,7 @@ This website is automatically built and deployed using GitHub Actions. The build
 4. Extracts the title and description
 5. Creates a card for each site
 6. Updates the website with these cards
+7. Deploys to GitHub Pages using the official GitHub Pages actions
 
 ## Adding New Links
 
