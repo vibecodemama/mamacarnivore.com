@@ -1,0 +1,221 @@
+/* 
+ * Mama Carnivore Website Styles
+ * Color theme inspired by profile photo with warm golden tones and natural greens
+ */
+
+:root {
+    /* Color palette inspired by the profile photo */
+    --golden-yellow: #f5c05a;
+    --warm-orange: #e8a87c;
+    --forest-green: #5d8a66;
+    --light-green: #a4c3a2;
+    --dark-brown: #3a2e2f;
+    --cream: #f9f5eb;
+    --light-gray: #f0f0f0;
+    --medium-gray: #d0d0d0;
+    --dark-gray: #333333;
+    
+    /* Typography */
+    --header-font: 'Playfair Display', serif;
+    --body-font: 'DM Sans', sans-serif;
+    --alt-body-font: 'Lora', serif;
+}
+
+/* Base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--body-font);
+    color: var(--dark-gray);
+    background-color: var(--cream);
+    line-height: 1.4;
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--header-font);
+    color: var(--dark-brown);
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+p {
+    margin-bottom: 1rem;
+}
+
+a {
+    color: var(--forest-green);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: var(--golden-yellow);
+}
+
+/* Header styles */
+header {
+    padding: 3rem 0;
+    background: linear-gradient(135deg, var(--light-green) 0%, var(--forest-green) 100%);
+    color: white;
+}
+
+.profile-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+@media (min-width: 768px) {
+    .profile-section {
+        flex-direction: row;
+        text-align: left;
+        align-items: center;
+        gap: 3rem;
+    }
+}
+
+.profile-image-container {
+    margin-bottom: 2rem;
+}
+
+@media (min-width: 768px) {
+    .profile-image-container {
+        margin-bottom: 0;
+    }
+}
+
+.profile-image {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 5px solid var(--golden-yellow);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.profile-info h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: white;
+}
+
+.bio {
+    font-family: var(--alt-body-font);
+    font-size: 1.1rem;
+    max-width: 600px;
+    color: var(--cream);
+}
+
+/* Main content styles */
+main {
+    padding: 3rem 0;
+}
+
+.section-title {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    position: relative;
+    padding-bottom: 1rem;
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 3px;
+    background-color: var(--golden-yellow);
+}
+
+/* Card grid styles */
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.card {
+    background-color: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.card-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.card-content {
+    padding: 1.5rem;
+}
+
+.card-title {
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+    color: var(--dark-brown);
+}
+
+.card-description {
+    font-size: 0.95rem;
+    color: var(--dark-gray);
+    margin-bottom: 1rem;
+}
+
+.card-link {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background-color: var(--forest-green);
+    color: white;
+    border-radius: 5px;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+}
+
+.card-link:hover {
+    background-color: var(--golden-yellow);
+    color: var(--dark-brown);
+}
+
+/* Loading indicator */
+.loading {
+    text-align: center;
+    padding: 2rem;
+    font-style: italic;
+    color: var(--dark-gray);
+}
+
+/* Footer styles */
+footer {
+    background-color: var(--dark-brown);
+    color: var(--cream);
+    padding: 2rem 0;
+    text-align: center;
+}
+
+footer p {
+    margin-bottom: 0;
+}

@@ -1,0 +1,29 @@
+{
+  "name": "mamacarnivore",
+  "version": "1.0.0",
+  "description": "Mama Carnivore's personal website",
+  "main": "index.js",
+  "scripts": {
+    "build": "node .github/scripts/build-site.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vibecodemama/mamacarnivore.com.git"
+  },
+  "keywords": [
+    "carnivore",
+    "nutrition",
+    "wellness"
+  ],
+  "author": "Mama Carnivore",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/vibecodemama/mamacarnivore.com/issues"
+  },
+  "homepage": "https://mamacarnivore.com",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.12",
+    "fs-extra": "^11.1.1",
+    "puppeteer": "^20.7.3"
+  }
+}
