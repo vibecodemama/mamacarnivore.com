@@ -11,8 +11,17 @@ const INDEX_FILE = path.join(process.cwd(), 'index.html');
 // Ensure screenshots directory exists
 fs.ensureDirSync(SCREENSHOTS_DIR);
 
+// Set a global timeout for the entire process (15 minutes)
+const GLOBAL_TIMEOUT = 15 * 60 * 1000; // 15 minutes in milliseconds
+
 async function main() {
   console.log('Starting site build process...');
+  
+  // Set a global timeout to prevent the process from hanging indefinitely
+  const timeout = setTimeout(() => {
+    console.error('Build process timed out after 15 minutes');
+    process.exit(1);
+  }, GLOBAL_TIMEOUT);
   
   // Read links from JSON file
   const linksData = await fs.readJson(LINKS_FILE);
@@ -20,21 +29,31 @@ async function main() {
   
   console.log(`Found ${links.length} links to process`);
   
-  // Launch browser
+  // Launch browser with additional CI-friendly configuration
   const browser = await puppeteer.launch({
-    args: ['--no-sandbox', '--disable-setuid-sandbox'],
-    headless: 'new'
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-gpu',
+      '--disable-extensions',
+      '--disable-accelerated-2d-canvas'
+    ],
+    headless: 'new',
+    timeout: 30000
   });
   
   const cardsHtml = [];
   
-  // Process each link
-  for (let i = 0; i < links.length; i++) {
-    const url = links[i];
-    console.log(`Processing ${i+1}/${links.length}: ${url}`);
+  // Helper function to process a single link with retries
+  async function processLink(browser, url, index, maxRetries = 2) {
+    let retries = 0;
     
-    try {
-      const page = await browser.newPage();
+    while (retries <= maxRetries) {
+      try {
+        console.log(`Processing ${index+1}/${links.length}: ${url}${retries > 0 ? ` (retry ${retries}/${maxRetries})` : ''}`);
+        
+        const page = await browser.newPage();
       
       // Set viewport size
       await page.setViewport({
@@ -42,14 +61,20 @@ async function main() {
         height: 800
       });
       
-      // Navigate to the page
+      // Set a reasonable timeout for navigation
+      await page.setDefaultNavigationTimeout(30000);
+      
+      // Set a reasonable timeout for other operations
+      await page.setDefaultTimeout(30000);
+      
+      // Navigate to the page with more reliable wait conditions
       await page.goto(url, {
-        waitUntil: 'networkidle2',
-        timeout: 60000
+        waitUntil: 'domcontentloaded',
+        timeout: 30000
       });
       
       // Take screenshot
-      const screenshotFileName = `screenshot-${i+1}.jpg`;
+      const screenshotFileName = `screenshot-${index+1}.jpg`;
       const screenshotPath = path.join(SCREENSHOTS_DIR, screenshotFileName);
       await page.screenshot({
         path: screenshotPath,
@@ -95,25 +120,41 @@ async function main() {
         </div>
       `;
       
-      cardsHtml.push(cardHtml);
-      
-      await page.close();
-    } catch (error) {
-      console.error(`Error processing ${url}:`, error);
-      
-      // Create error card
-      const cardHtml = `
-        <div class="card">
-          <div class="card-content">
-            <h3 class="card-title">Error Loading Site</h3>
-            <p class="card-description">There was an error loading ${url}. The site may be temporarily unavailable.</p>
-            <a href="${url}" class="card-link" target="_blank">Try Visiting Site</a>
-          </div>
-        </div>
-      `;
-      
-      cardsHtml.push(cardHtml);
+        await page.close();
+        
+        // If we get here, processing was successful
+        return cardHtml;
+      } catch (error) {
+        await page?.close().catch(() => {}); // Close page if it exists and ignore errors
+        
+        if (retries < maxRetries) {
+          console.log(`Error processing ${url}, retrying (${retries+1}/${maxRetries}):`, error.message);
+          retries++;
+          // Wait before retrying
+          await new Promise(resolve => setTimeout(resolve, 3000));
+        } else {
+          console.error(`Failed to process ${url} after ${maxRetries} retries:`, error);
+          
+          // Create error card
+          return `
+            <div class="card">
+              <div class="card-content">
+                <h3 class="card-title">Error Loading Site</h3>
+                <p class="card-description">There was an error loading ${url}. The site may be temporarily unavailable.</p>
+                <a href="${url}" class="card-link" target="_blank">Try Visiting Site</a>
+              </div>
+            </div>
+          `;
+        }
+      }
     }
+  }
+  
+  // Process each link with a more resilient approach
+  for (let i = 0; i < links.length; i++) {
+    const url = links[i];
+    const cardHtml = await processLink(browser, url, i);
+    cardsHtml.push(cardHtml);
   }
   
   // Close browser
@@ -132,6 +173,9 @@ async function main() {
   await fs.writeFile(INDEX_FILE, indexHtml);
   
   console.log('Site build completed successfully!');
+  
+  // Clear the global timeout since we completed successfully
+  clearTimeout(timeout);
 }
 
 // Run the main function
